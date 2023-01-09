@@ -1,0 +1,187 @@
+[0001] Lore
+_____________________________________________________________
+
+A website template written in bash scripts. Can be used as
+blog, documentation pages, etc.
+
++-----------------------------------------------------------+
+| NOTICE                                                    |
+|                                                           |
+| This is a build instructions, if you want to read about   |
+| ceheki's lore see $/lore/about (/site/lore/about.txt)     |
++-----------------------------------------------------------+
+
+* Lore ............................................... [0001]
+* Building ........................................... [0002]
+* Usage .............................................. [0003]
+  * Serving on dev ................................... [0004]
+* Writing own pages .................................. [0005]
+  * Static pages ..................................... [0006]
+  * Build-time generated pages ....................... [0007]
+  * Page parts ....................................... [0008]
+* License and authors ................................ [0009]
+                                             30 November 2022
+                                                   Revision 1
+
+[0002] Building
+_____________________________________________________________
+
+To build pages just run ./compile.sh without arguments. Also,
+there is makefile, but it uses only on dev server (see
+section [0005]).
+
++-----------------------------------------------------------+
+|                                                           |
+| REBUILD ALL PAGES:                                        |
+|  $ ./compile.sh                                           |
+| REBUILD SINGLE PAGE:                                      |
+|  $ ./compile.sh site/page.txt                             |
+| REBUILD ONLY NEEDED:                                      |
+|  $ make all                                               |
+| CLEAN                                                     |
+|  $ make clean                                             |
+|                                                           |
++-----------------------------------------------------------+
+
+
+[0003] Usage
+_____________________________________________________________
+
+All needed html pages located in out/ (after build), so just
+copy it to needed location (/var/www/html, for example).
+
+--[0004] Serving on dev -------------------------------------
+
+  There also a super-tiny web server written in bash scripts:
+  ./serve.sh. It requires netcat (also called nc).
+
+  serve.sh automaticlly recompiles project (only needed) on
+  request, so you don't need do ./compile.sh every save.
+
+  +---------------------------------------------------------+
+  |                                                         |
+  | START DEV SERVER ON PORT 8080:                          |
+  |  $ ./serve.sh                                           |
+  |  Running server on http://localhost:8080/               |
+  | START DEV SERVER ON PORT 25565:                         |
+  |  $ ./serve.sh 25565                                     |
+  |  Running server on http://localhost:25565/              |
+  |                                                         |
+  +---------------------------------------------------------+
+
+  By the way, it very shitcoded, so if firefox tells that web
+  server is poop, you can debug it and open issue :)
+
+  +---------------------------------------------------------+
+  | $ echo 'GET / HTTP/1.1' | _SERVE_STATUS=run ./serve.sh  |
+  +---------------------------------------------------------+
+
+
+[0005] Writing own pages
+_____________________________________________________________
+
+Oh... For now, there few formatting rules. First, write
+alligned text like this (maximum line size, for example in
+my documents its 61)
+
++-----------+-----------------------------------------------+
+| Syntax    | Description                                   |
++-----------+-----------------------------------------------+
+|           |                                               |
+| [0001]    | Section links. See [0006] for more info       |
+| [1], [12] | Text links. Jumps to link defination          |
+| $/index   | Page links. Jumps to /index                   |
+| ~torvalds | Github links. Jumps to github.com/torvalds    |
+|           |                                               |
++-----------+-----------------------------------------------+
+
+--[0006] Static pages ---------------------------------------
+
+  Static pages located in site/ and named like page.txt. It
+  never starts with #! (don't ask).
+
+  Static pages supports two types of text links: 1-2 digits,
+  that links to defination, source, etc and 4 digits, that
+  links to section.
+
+  Section always starts from section link, like section in
+  this document. Also, subsection can starts with --[DDDD]
+  like this subsection. Section links in regular text will
+  link to section/subsection (ex.: [0001]).
+
+  Definations looks like this: "[1] Foo bar" and link to it
+  can be placed in regular text (ex.: [1], [12]).
+
+  Page example:
+  +---------------------------------------------------------+
+  | [0001] Page name                                        |
+  | _______________________________________________________ |
+  |                                                         |
+  | Some[1] text, see more in section [0001] Page name.     |
+  |                                                         |
+  | [0002] Additional resources                             |
+  | _______________________________________________________ |
+  |                                                         |
+  | [1] Some is not a variant of Option enum                |
+  |                                                         |
+  +---------------------------------------------------------+
+
+  By the way, page may looks not like this, but anchors
+  should be first on line:
+  +---------------------------------------------------------+
+  |                                                         |
+  | [0001]                              Welcome to Foo Bar! |
+  | Also, see [1]. Section link: [0001]. ~torvalds one <3.  |
+  |                                                         |
+  | [1] ...                                                 |
+  |                                                         |
+  +---------------------------------------------------------+
+
+--[0007] Build-time generated pages -------------------------
+
+  Build-time generated pages just static pages, but generates
+  on build time.
+
+  Its like static pages in naming: located in site/... and
+  have .txt extension, but to compile it it runs via bash.
+  It should starts with #! (#!/bin/bash) and output content
+  to stdout.
+
+  +---------------------------------------------------------+
+  |                                                         |
+  | #!/bin/bash                                             |
+  |                                                         |
+  | echo '[0001] Build date'                                |
+  | echo "This page built $(date)"                          |
+  |                                                         |
+  +---------------------------------------------------------+
+
+  Build-time generated pages good for generating lists, like
+  list of blog post, etc. See site/lore.txt or
+  site/projects.txt for examples.
+
+--[0008] Page parts -----------------------------------------
+
+  For compile text page to HTML document we need base html
+  structure with <title> and other tags.
+
+  Output document starts with parts/begin-*.html files and
+  ends with parts/end-*.html in alphabet order (0001 first).
+
+  parts/begin-*.html files can also contains $filename
+  variable, that will be replaced with file basename.
+
+
+[0009] License and authors
+_____________________________________________________________
+
+compile.sh, serve.sh, makefile and etc except site/ contens
+licensed under The Unlicense (https://unlicense.org/).
+Um... Public domain.
+
+Text documents (and some scripts, don't matter) in site/
+is just trash. Yes, I write it. There no license, you can use
+it in ((any)) purposes.
+
+Original author is ValgrindLLVM.
+
